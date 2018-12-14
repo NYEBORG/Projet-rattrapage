@@ -3,8 +3,8 @@
 //
 #include "historique.h"
 
-
-void initCommande(Commande *historique, char nom[], char prenom[], char immatriculation[], int debut, int fin) {
+//Initialisation de la commande qui permet de rentrer
+void initCommande(Commande *historique, char nom[], char prenom[], char immatriculation[], Date debut, Date fin) {
 
     strcpy(historique->nom, nom);
     strcpy(historique->prenom, prenom);
@@ -14,49 +14,59 @@ void initCommande(Commande *historique, char nom[], char prenom[], char immatric
 
 }
 
-
+//Fonction qui lit l'historique
 int lireHistorique(Commande *historique) {
     int size = 0;
+    char stringDebut[255], stringFin[255], colonne[255];
 
-    historique = calloc(0, sizeof(Commande));
 
     FILE *fichier = NULL;
     fichier = fopen("D:\\utilisateur nyebo\\CLionProjects\\Projet rattrapage 1\\cmake-build-debug\\history.csv", "r");
-
+    fscanf(fichier, "%s", colonne);
     while (!feof(fichier)) {
         size++;
 
-        historique = realloc(historique, size * sizeof(historique));
-        fscanf(fichier, "%s;%s;%s;%d;%d", historique[size - 1].nom, historique[size - 1].prenom,
-               historique[size - 1].immatriculation, &(historique[size - 1].debut), &(historique[size - 1].fin));
-        fclose(fichier);
+        historique = realloc(historique, size * sizeof(Commande));
+        fscanf(fichier, "%[^';'|\]s;%[^';'|\]s;%[^';'|\]s;%[^';'|\]s;%[^';'|\]s", historique[size - 1].nom,
+               historique[size - 1].prenom, historique[size - 1].immatriculation, stringDebut, stringFin);
 
+        scanDate(&(historique[size - 1].debut), stringDebut);
+        scanDate(&(historique[size - 1].fin), stringFin);
 
     }
+    fclose(fichier);
     return size;
 
 }
 
+
 void entreeUtilisateur(Commande *commande) {
 
+    char debut[255], fin[255];
 
     printf("Entrez votre nom : ");
-    scanf("%s\n", commande->nom);
-    printf("prenom ");
-    scanf("%s\n", commande->prenom);
-    printf("nombre début de location :");
-    scanf("%d\n", &(commande->debut));
-    printf("fin de location :");
-    scanf("%d\n", &(commande->fin));
+    scanf("%s", commande->nom);
+    printf("\nprenom");
+    scanf("%s", commande->prenom);
+    do {
+        printf("\nDate début de location(jour/mois/année):");
+        scanf("%s", debut);
+        scanDate(&(commande->debut), debut);
+
+    } while (!jourValide(commande->debut) && !moisValide(commande->debut));
+
+    do {
+        printf("\n2fin de location :");
+        scanf("%s", fin);
+        scanDate(&(commande->fin), fin);
+    } while (!jourValide(commande->fin) && !moisValide(commande->fin));
+
 
 }
 
-bool moisValide() {
-    enum Mois mois = 0, jour = 0;
-    tempo *Date = 0;
-
-    Date->jour = jour;
-    Date->mois = mois;
+bool moisValide(Date date) {
+    int jour = date.jour;
+    int mois = date.mois;
 
 
     if (mois > 12 || mois < 1)
@@ -67,13 +77,10 @@ bool moisValide() {
 }
 
 
-bool jourValide() {
+bool jourValide(Date date) {
 
-    enum Mois mois = 0, jour = 0;
-    tempo *Date = 0;
-
-    Date->jour = jour;
-    Date->mois = mois;
+    int jour = date.jour;
+    int mois = date.mois;
 
 
     if (jour <= 0)
@@ -100,35 +107,49 @@ bool jourValide() {
 
 }
 
-
-void disponibilite() {
-
-    enum Mois mois = 0, jour = 0;
-    tempo *Date = 0;
-
-    Date->jour = jour;
-    Date->mois = mois;
-
-    scanf("%d\n", &jour);
-    scanf("%d\n", &mois);
-
-
+void scanDate(Date *maDate,
+              char *stringSource) {//string source contient la date sous le format jour/mois/année en chaîne de caractère. Lecture de stringSource et conversion en structure de type date.
+    sscanf(stringSource, "%d/%d/%d", &(maDate->jour), &(maDate->mois), &(maDate->annee));
 }
 
+//sprintf fonctionne comme sscanf sauf qu'elle print
+void printDate(Date *maDate, char *stringDest) {
+    sprintf(stringDest, "%d/%d/%d", maDate->jour, maDate->mois, maDate->annee);
+}
+
+//Fonction qui compare les dates
 int compDates(Date date1, Date date2) {
 
     if (date1.annee != date2.annee) {
 
         if (date1.annee > date2.annee)
             return SUPERIEUR;
-        else if (date1.annee < date2.annee)
+        if (date1.annee < date2.annee)
             return INFERIEUR;
-        if (date1.mois )
+        if (date1.mois > date2.mois)
+            return SUPERIEUR;
+        if (date1.mois < date2.mois)
+            return INFERIEUR;
         if (date1.jour > date2.jour)
             return SUPERIEUR;
-        else if (date1.jour < date2.jour)
-            if()
-
+        if (date1.jour < date2.jour)
+            return INFERIEUR;
+        if (date1.jour == date2.jour)
+            return EGAL;
 
     }
 }
+
+//Print dans l'historique
+void printHistorique(Commande *commande, int size) {
+
+    for (int i = 0; i < size; i++) {
+        char stringDebut[255], stringFin[255];
+
+        printDate(&(commande->debut), stringDebut);
+        printDate(&(commande->fin), stringFin);
+        printf("%s;%s;%s;%s;%s", commande->nom, commande->prenom, commande->immatriculation, stringDebut, stringFin);
+    }
+
+
+};

@@ -10,11 +10,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct {
+typedef struct date Date;
+struct date{
     int jour;
     int mois;
     int annee;
-} Date;
+};
 
 int compDates(Date date1,Date date2);
 
@@ -32,18 +33,21 @@ Date fin;
 };
 
 int lireHistorique( Commande* historique);
-void initCommande(Commande * historique, char nom[], char prenom[], char immatriculation[], int debut, int fin);
+
 void entreeUtilisateur(Commande * commande);
 
-typedef struct tempo tempo;
-struct tempo{
-    int jour;
-    int mois;
-};
-
-
-bool jourValide();
 bool moisValide();
+bool jourValide();
+
+
+void scanDate(Date * maDate, char * stringSource);
+void printDate(Date *maDate,char *stringDest);
+
+
+void printHistorique(Commande * commande, int size);
+
+void initCommande(Commande * historique, char nom[], char prenom[], char immatriculation[], Date debut, Date fin);
+
 
 void disponibilite();
 

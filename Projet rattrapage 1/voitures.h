@@ -10,16 +10,16 @@
 #include <string.h>
 #include <stdbool.h>
 
-
-typedef struct voiture voiture;
+//Structure de type voiture
+typedef struct voiture Voiture;
 struct voiture {
     char immatriculation[15];
     char marque[30];
     char modele[30];
 
 };
-
-void initVoiture(voiture * maVoiture, char immatriculation[], char marque[], char modele[]);
+// Initialisation de la voiture
+void initVoiture(Voiture * maVoiture, char immatriculation[], char marque[], char modele[]);
 
 
 
